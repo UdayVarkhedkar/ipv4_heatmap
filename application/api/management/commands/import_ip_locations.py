@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 # Uses counter to calculate current batch size of ip_locations (as opposed to checking length of ip_locations)
                 # Bulk saves all IPLocation objects in ip_locations
                 # Flushes ip_locations
-                if counter % options['batch_size'] == 0:
+                if counter % int(options['batch_size']) == 0:
                     IPLocation.objects.bulk_create(ip_locations)
                     ip_locations = []
             
