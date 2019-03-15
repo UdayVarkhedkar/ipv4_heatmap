@@ -1,0 +1,4 @@
+*.pyc
+.python-version
+application/config.py
+application/api/migrations/
