@@ -1,4 +1,5 @@
 *.pyc
 .python-version
 application/config.py
+application/ipv4_locations.csv
 application/api/migrations/
