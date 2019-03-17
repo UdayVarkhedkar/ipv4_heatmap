@@ -9,10 +9,12 @@ paris = (48.852754, 2.347039)
 melbourne = (-37.822527, 144.980063)
 buenos_aires = (-34.593175, -58.442160)
 atlantic_ocean = (29.956295, -44.907266)
+above_this_world = (100, 0)
+aside_this_world = (0, 250)
 
 class IPLocationAPITest(TestCase):
     def setUp(self):
-        IPLocation.objects.create(ip_network='durham', latitude=36, longitude=-79)
+        IPLocation.objects.create(ip_network='durham', latitude=35.99, longitude=-78.9)
         IPLocation.objects.create(ip_network='paris', latitude=49, longitude=2.5)
         IPLocation.objects.create(ip_network='melbourne', latitude=-38, longitude=145)
         IPLocation.objects.create(ip_network='buenos aires', latitude=-35, longitude=-58)
@@ -36,6 +38,20 @@ class IPLocationAPITest(TestCase):
         coordinates['latitude2'] = latitude_min
         return coordinates
 
+    def test_invalid_request_method(self):
+        response = self.client.post('/api/')
+        self.assertEqual(response.status_code, 405)
+
+    # Default parameters are set to Durham, NC
+    def test_default_ip_locations(self):
+        response = self.client.get('/api/?')
+        self.assertEqual(response.status_code, 200)
+        try:
+            response_json = json.loads(response.content)
+        except json.JSONDecodeError:
+            self.fail("First argument is not valid JSON: %r" % response.content)
+        self.assertEqual(int(response_json["hits"]), 1)
+
     def test_durham_ip_locations(self):
         api_parameters = self._get_surrounding_latlong_boundaries(durham)
         response = self.client.get('/api/?', api_parameters)
@@ -44,7 +60,6 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Success")
         self.assertEqual(int(response_json["hits"]), 1)
 
     def test_paris_ip_locations(self):
@@ -55,7 +70,6 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Success")
         self.assertEqual(int(response_json["hits"]), 1)
 
     def test_melbourne_ip_locations(self):
@@ -66,7 +80,6 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Success")
         self.assertEqual(int(response_json["hits"]), 1)
 
     def test_buenos_aires_ip_locations(self):
@@ -77,7 +90,6 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Success")
         self.assertEqual(int(response_json["hits"]), 1)
 
     def test_atlantic_ip_locations(self):
@@ -88,7 +100,7 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Failure")
+        self.assertEqual(response_json["hits"], 0)
         
     def test_reverse_latlong_coordinates(self):
         api_parameters = self._get_surrounding_latlong_boundaries(durham)
@@ -99,5 +111,14 @@ class IPLocationAPITest(TestCase):
             response_json = json.loads(response.content)
         except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % response.content)
-        self.assertEqual(response_json["status"], "Success")
         self.assertEqual(int(response_json["hits"]), 1)
+
+    def test_above_world_coordinates(self):
+        api_parameters = self._get_surrounding_latlong_boundaries(above_this_world)
+        response = self.client.get('/api/?', api_parameters)
+        self.assertEqual(response.status_code, 400)
+
+    def test_aside_world_coordinates(self):
+        api_parameters = self._get_surrounding_latlong_boundaries(aside_this_world)
+        response = self.client.get('/api/?', api_parameters)
+        self.assertEqual(response.status_code, 400)

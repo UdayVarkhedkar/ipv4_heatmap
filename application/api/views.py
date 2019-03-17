@@ -12,10 +12,10 @@ from api.serializers import IPLocationSerializer
 @api_view()
 def index(request):
     # Get querystring parameter values
-    latitude1 = Decimal(request.GET.get("latitude1", 35.5))
-    longitude1 = Decimal(request.GET.get("longitude1", -78.5))
-    latitude2 = Decimal(request.GET.get("latitude2", 35.75))
-    longitude2 = Decimal(request.GET.get("longitude2", -78.75))
+    latitude1 = Decimal(request.GET.get("latitude1", 35.75))
+    longitude1 = Decimal(request.GET.get("longitude1", -78.75))
+    latitude2 = Decimal(request.GET.get("latitude2", 36.25))
+    longitude2 = Decimal(request.GET.get("longitude2", -79.25))
 
     # Establish min/max latitude/longitude values for Postgresql Between
     min_latitude = min(latitude1, latitude2)
@@ -25,7 +25,7 @@ def index(request):
 
     # Ensure provided longitude/latitude values are within possible bounds
     if min_latitude < -90 or max_latitude > 90 or min_longitude < -180 or max_longitude > 180:
-        return Response({"message": "Latitude of longitude values exceeded possible bounds."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Latitude or longitude values exceeded possible bounds."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Retrieve ip locations within geographic boundary and count
     ip_locations = IPLocation.objects.filter(latitude__range=(min_latitude, max_latitude), longitude__range=(min_longitude, max_longitude))
