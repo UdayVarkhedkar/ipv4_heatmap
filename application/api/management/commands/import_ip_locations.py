@@ -45,6 +45,9 @@ class Command(BaseCommand):
                     print(f"{ network } does not have an associated longitude")
                     continue
 
+                if ip_latitude < -90 or ip_latitude > 90 or ip_longitude < -180 or ip_longitude > 180:
+                    print(f"{ network } does not have possible latitude/longitude values")
+
                 # Append IPLocation object instance to ip_locations list. 
                 # Note: This does not save the IPLocation object
                 ip_locations.append(IPLocation(
