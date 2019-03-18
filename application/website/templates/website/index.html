@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Local Static CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static 'website/style.css' %}">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+            integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+            crossorigin=""/>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>     
+        <script src="{% static 'website/leaflet-heat.js' %}"></script>
+        <script src="{% static 'website/config.js' %}"></script>
+        <script>
+
+            function retrieve_ip_networks(parameters){
+                $.ajax({
+                type: "GET",
+                data: parameters,
+                dataType: "json",
+                url: "/api/",
+                success: function(msg){
+                    console.log(msg['hits'] + " networks were found in this area.")
+                    heatmap_points = Array.from(msg['ip_locations']);
+                    heatmap_points = heatmap_points.map(function(x) { return [x['latitude'], x['longitude']]; });
+                    var heat = L.heatLayer(heatmap_points).addTo(mymap);
+                }});
+            }
+            
+            function on_map_load(){
+                var api_parameters = {};
+                var new_bounds = mymap.getBounds();
+                api_parameters['latitude1'] = (new_bounds['_southWest']['lat']).toFixed(2);
+                api_parameters['longitude1'] = new_bounds['_southWest']['lng'].toFixed(2);
+                api_parameters['latitude2'] = new_bounds['_northEast']['lat'].toFixed(2);
+                api_parameters['longitude2'] = new_bounds['_northEast']['lng'].toFixed(2);
+                console.log(api_parameters);
+                retrieve_ip_networks(api_parameters);
+            }
+            
+            function on_map_move(){
+                var api_parameters = {};
+                var new_bounds = mymap.getBounds();
+                api_parameters['latitude1'] = (new_bounds['_southWest']['lat']).toFixed(2);
+                api_parameters['longitude1'] = new_bounds['_southWest']['lng'].toFixed(2);
+                api_parameters['latitude2'] = new_bounds['_northEast']['lat'].toFixed(2);
+                api_parameters['longitude2'] = new_bounds['_northEast']['lng'].toFixed(2);
+                console.log(api_parameters);
+                retrieve_ip_networks(api_parameters);
+            }
+        </script>
+    </head>
+    <body>
+        <div class="navbar justify-content-center navbar-light bg-light">
+            <a class="navbar-brand" href="https://github.com/UdayVarkhedkar/ipv4_heatmap">
+                <img src="{% static 'website/Github-Mark.png' %}" width="18" height="18" alt="Link to the Github Repo">
+            </a>
+            <div class="navbar-brand" name="header">Interactive Heatmap of IPv4 Networks</div>
+            <div class="navbar-text" name="byline">by Uday Varkhedkar</div>
+        </div>
+        <div class="row h-100">
+            <div class="col-lg-2"></div>
+            <div id="mapid" class="col-lg-8"></div>
+            <div class="col-lg-2"></div>
+        </div>
+    <script>
+        var mymap = L.map('mapid')
+        mymap.on('load', function() {
+            on_map_load()
+            });
+        mymap.setView([35.995, -78.9], 10);
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 14,
+            minZoom: 7,
+            id: 'mapbox.streets',
+            accessToken: mapbox_access_token
+            }).addTo(mymap);
+        mymap.on('moveend', function() { 
+            on_map_move()
+            });
+    </script>
+    </body>
+</html>
