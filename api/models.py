@@ -6,5 +6,8 @@ class IPLocation(models.Model):
     latitude = models.DecimalField(max_digits=6, decimal_places=2)
     longitude = models.DecimalField(max_digits=6, decimal_places=2)
 
+    class Meta:
+        ordering = ['latitude', 'longitude']
+
     def __str__(self):
         return self.ip_network
