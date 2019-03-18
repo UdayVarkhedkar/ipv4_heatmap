@@ -94,6 +94,8 @@ DATABASES = {
 
 DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
