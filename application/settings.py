@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
+import dj_database_url
 
 import os
 
@@ -79,6 +80,9 @@ WSGI_APPLICATION = 'application.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+db_from_env = dj_database_url.config()
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -89,6 +93,8 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
