@@ -16,4 +16,4 @@ Finally, you should be ready to run `python manage.py runserver` to run the appl
 
 ## Room for Improvement
 
-The main pain point with the application now is the API retrieval time. I attempted to address this and saw some improvements by limiting the level of granularity of the latitude/longitude values and ordering the Django model IPLocation by latitude/longitude values. Looking into indexing the latitude/longitude values could be beneficial. Additionally, identifying how to best compress the API response, perhaps using Django's GzipMiddleware, should lead to a good performance boost as well. g
+The main pain point with the application now is the API retrieval time. I attempted to address this and saw some improvements by limiting the level of granularity of the latitude/longitude values and ordering the Django model IPLocation by latitude/longitude values. Looking into indexing the latitude/longitude values could be beneficial. Additionally, identifying how to best compress the API response, perhaps using Django's GzipMiddleware, should lead to a good performance boost as well.
